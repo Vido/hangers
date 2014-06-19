@@ -7,6 +7,8 @@ class Hanger(object):
     def __init__(self, stand, location):
         self.stand = stand
         self.location = location
+        self.status = False
+        self.code = None
         self.pin = None
 
     def update(self, code):
@@ -18,12 +20,14 @@ class Hanger(object):
         stock_status = json.load(response)
 
         if stock_status[unicode(self.code)] >= 0:
+            self.state = True
             pin.high()
         else:
+            self.state = False
             pin.low()
 
     def status(self):
-        return pin.state
+        return self.state
 
 
 class Stand(object):
@@ -55,5 +59,5 @@ class Stand(object):
                 'code': hanger.code,
                 'state': hanger.status,
             })
-        return json.dumps(hanger_list)
 
+        return hanger_list

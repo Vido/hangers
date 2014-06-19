@@ -1,8 +1,8 @@
-import json
 import sqlite3
 
-from flask import Flask
-app = Flask('Stock WebService')
+import flask
+
+app = flask.Flask('Stock WebService')
 
 @app.route('/')
 def index():
@@ -15,9 +15,10 @@ def check_stock(code):
     template = "SELECT code, quantity FROM inventory WHERE code = {_code}"
     query = cur.execute(template.format(_code=code))
     results = query.fetchall()
-    response = json.dumps({k: v for k, v in results})
     conn.close()
-    return response
+
+    response = {k: v for k, v in results}
+    return flask.jsonify(response)
 
 if __name__ == '__main__':
     app.debug = True
