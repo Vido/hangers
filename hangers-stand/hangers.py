@@ -11,23 +11,23 @@ class Hanger(object):
         self.code = None
         self.pin = None
 
-    def update(self, code):
+    def configure(self, code):
         self.code = code
-        self.url = stand.url + str(code)
+        self.url = self.stand.url + str(code)
 
     def refresh(self):
         response = urllib2.urlopen(self.url)
         stock_status = json.load(response)
 
-        if stock_status[unicode(self.code)] >= 0:
-            self.state = True
-            pin.high()
-        else:
-            self.state = False
-            pin.low()
+        self.status = False
+        if int(stock_status[unicode(self.code)]) > 0:
+            self.status = True
 
-    def status(self):
-        return self.state
+    def update(self):
+        if self.status:
+            self.pin.high()
+        else:
+            self.pin.low()
 
 
 class Stand(object):
@@ -45,11 +45,14 @@ class Stand(object):
         for location, pin in enumerate(pin_list):
             hanger = Hanger(self, location)
             hanger.pin = self._board.pins[pin]
+            hanger.pin.mode = 'OUT'
             self.hangers.append(hanger)
 
     def refresh(self):
         for hanger in self.hangers:
-            hanger.refresh()
+            if hanger.code:
+                hanger.refresh()
+            hanger.update()
 
     def list(self):
         hanger_list = []

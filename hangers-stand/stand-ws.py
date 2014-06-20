@@ -12,7 +12,11 @@ stand._hang_hangers(board)
 
 @app.route('/')
 def index():
-    return '<h1>stand-ws</h1>'
+    response = '<h1>stand-ws</h1>' \
+    '<ul>/list_hangers</ul>' \
+    '<ul>/configure/$localtion/?code=$code</ul>' \
+    '<ul>/refresh</ul>'
+    return response
 
 @app.route('/list_hangers/')
 def list_hangers():
@@ -22,7 +26,15 @@ def list_hangers():
 @app.route('/refresh')
 def refresh():
     stand.refresh()
-    return
+    return flask.Response('', mimetype='application/json')
+
+@app.route('/configure/<location>/')
+def configure(location):
+    code = int(flask.request.args.get('code'))
+    hanger = stand.hangers[int(location)]
+    hanger.configure(code)
+    return flask.Response('', mimetype='application/json')
+
 
 if __name__ == '__main__':
     app.debug = True
