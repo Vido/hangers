@@ -21,7 +21,7 @@ def list_hangers():
     response = json.dumps(stand.list(), indent=4)
     return flask.Response(response, mimetype='application/json')
 
-@app.route('/refresh')
+@app.route('/refresh/')
 def refresh():
     stand.refresh()
     return flask.Response('', mimetype='application/json')
